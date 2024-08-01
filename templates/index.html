@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Localhost Chat App</title>
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+        #message { width: 80%; }
+    </style>
+</head>
+<body>
+    <h1>Chat with Me!</h1>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Type your message here">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        function fetchMessages() {
+            $.get('/messages', function(data) {
+                $('#chat').html('');
+                data.messages.forEach(function(message) {
+                    $('#chat').append('<p>' + message + '</p>');
+                });
+            });
+        }
+
+        function sendMessage() {
+            var message = $('#message').val();
+            $.post('/send', { message: message }, function(response) {
+                if(response.success) {
+                    $('#message').val('');
+                    fetchMessages();
+                }
+            });
+        }
+
+        setInterval(fetchMessages, 1000);
+    </script>
+</body>
+</html>
